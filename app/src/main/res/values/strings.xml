@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Camera App</string>
+    <string name="camera_permission_required">Camera permission is required to use this app</string>
+    <string name="camera_permission_denied">Camera permission was permanently denied</string>
+    <string name="photo_saved">Photo saved successfully</string>
+    <string name="photo_capture_failed">Failed to capture photo</string>
+    <string name="switch_camera">Switch camera</string>
+    <string name="capture_photo">Capture photo</string>
+    <string name="toggle_flash">Toggle flash</string>
+</resources>
