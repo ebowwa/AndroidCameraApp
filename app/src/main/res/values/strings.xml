@@ -7,4 +7,16 @@
     <string name="switch_camera">Switch camera</string>
     <string name="capture_photo">Capture photo</string>
     <string name="toggle_flash">Toggle flash</string>
+
+    <!-- Hand Tracking Strings -->
+    <string name="hand_tracking_disabled">Hand Tracking: OFF</string>
+    <string name="hand_tracking_enabled">Hand Tracking: ON</string>
+    <string name="mediapipe_ready">MediaPipe Ready</string>
+    <string name="setup_failed">Setup Failed</string>
+    <string name="camera_active">Camera Active</string>
+    <string name="camera_error">Camera Error</string>
+    <string name="tracking_enabled">Tracking Enabled</string>
+    <string name="tracking_disabled">Tracking Disabled</string>
+    <string name="no_hands_detected">No hands detected</string>
+    <string name="detection_error">Detection Error</string>
 </resources>
