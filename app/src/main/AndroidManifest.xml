@@ -9,6 +9,10 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <!-- Additional permissions for background camera operations -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!-- Camera features -->
     <uses-feature android:name="android.hardware.camera.any" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
@@ -47,6 +51,25 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Camera API Integration - Broadcast Receiver -->
+        <receiver
+            android:name=".CameraTriggerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.camerapp.CAPTURE_PHOTO" />
+                <action android:name="com.camerapp.START_AUTO_CAPTURE" />
+                <action android:name="com.camerapp.STOP_AUTO_CAPTURE" />
+                <action android:name="com.camerapp.SET_CAMERA_CONFIG" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Camera API Integration - Background Service -->
+        <service
+            android:name=".CameraTriggerService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="camera" />
 
     </application>
 

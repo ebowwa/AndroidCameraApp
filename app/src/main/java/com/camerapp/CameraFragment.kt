@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.util.Size
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -39,6 +40,7 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var isFlashEnabled = false
+    private var smartImageAnalyzer: SmartImageAnalyzer? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -109,14 +111,36 @@ class CameraFragment : Fragment() {
                 // .setJpegQuality(100)  // Example: Highest quality
                 .build()
 
+            // SMART IMAGE ANALYZER - ADVANCED CameraX API FEATURES
+            // This replaces the basic ImageAnalysis with intelligent scene analysis
+            // Features: Motion detection, scene classification, optimal capture timing
+            // Integration: Links with Broadcast Receiver API for external triggers
+            smartImageAnalyzer = SmartImageAnalyzer(
+                onMotionDetected = {
+                    // Trigger capture or notification when motion is detected
+                    Log.d("CameraFragment", "Motion detected - potential auto-capture trigger")
+                    // Could integrate with vibration or sound feedback for glasses
+                },
+                onOptimalScene = {
+                    // Automatically capture when scene conditions are optimal
+                    Log.d("CameraFragment", "Optimal scene detected - auto-capturing")
+                    lifecycleScope.launch {
+                        takePhotoAuto()
+                    }
+                },
+                onBrightnessChange = { brightness ->
+                    // Update UI or adjust camera settings based on lighting
+                    Log.d("CameraFragment", "Brightness: ${"%.2f".format(brightness)}")
+                    // Could suggest flash usage or adjust exposure compensation
+                }
+            )
+
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetResolution(Size(640, 480)) // Lower resolution for analysis performance
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor) { imageProxy ->
-                        // Image analysis for focus, exposure, etc.
-                        imageProxy.close()
-                    }
+                    it.setAnalyzer(cameraExecutor, smartImageAnalyzer!!)
                 }
 
             try {
@@ -175,6 +199,39 @@ class CameraFragment : Fragment() {
         )
     }
 
+    // AUTO-CAPTURE METHOD - Called by SmartImageAnalyzer
+    // This enables automatic photo capture when optimal conditions are detected
+    private fun takePhotoAuto() {
+        val imageCapture = imageCapture ?: return
+
+        val photoFile = createImageFile(requireContext())
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e("CameraX", "Auto-capture failed: ${exc.message}", exc)
+                }
+
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    val savedUri = output.savedUri ?: return
+
+                    // Add to gallery
+                    addImageToGallery(photoFile, requireContext())
+
+                    Log.d("CameraX", "Auto-captured photo saved: $savedUri")
+
+                    // Show brief notification instead of full UI feedback for auto-capture
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(requireContext(), "Auto-captured photo", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        )
+    }
+
     // switchCamera() function removed - glasses use back camera only
     // No camera switching functionality needed
 
@@ -209,6 +266,11 @@ class CameraFragment : Fragment() {
         super.onDestroyView()
         cameraExecutor.shutdown()
         cameraProvider?.unbindAll()
+
+        // Cleanup smart image analyzer resources
+        smartImageAnalyzer?.cleanup()
+        smartImageAnalyzer = null
+
         _binding = null
     }
 
