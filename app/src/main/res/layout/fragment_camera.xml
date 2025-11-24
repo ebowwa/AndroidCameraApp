@@ -62,16 +62,8 @@
             android:src="@drawable/ic_camera"
             android:tint="@color/white" />
 
-        <!-- Switch Camera Button -->
-        <ImageButton
-            android:id="@+id/switchCameraButton"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="24dp"
-            android:background="@drawable/circular_button_background"
-            android:contentDescription="Switch camera"
-            android:src="@drawable/ic_flip_camera"
-            android:tint="@color/white" />
+        <!-- Switch Camera Button - REMOVED -->
+        <!-- No camera switching - glasses use back camera only -->
 
     </LinearLayout>
 

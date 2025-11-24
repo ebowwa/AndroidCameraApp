@@ -55,8 +55,8 @@ class CameraFragment : Fragment() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         binding.captureButton.setOnClickListener { takePhoto() }
-        binding.switchCameraButton.setOnClickListener { switchCamera() }
         binding.flashButton.setOnClickListener { toggleFlash() }
+        // Switch camera button removed - glasses use back camera only
 
         startCamera()
     }
@@ -141,14 +141,8 @@ class CameraFragment : Fragment() {
         )
     }
 
-    private fun switchCamera() {
-        cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-            CameraSelector.DEFAULT_FRONT_CAMERA
-        } else {
-            CameraSelector.DEFAULT_BACK_CAMERA
-        }
-        startCamera()
-    }
+    // switchCamera() function removed - glasses use back camera only
+    // No camera switching functionality needed
 
     private fun toggleFlash() {
         val camera = camera ?: return
