@@ -67,14 +67,46 @@ class CameraFragment : Fragment() {
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
 
+            // Preview use case - CAMERA PREVIEW CONFIGURATION
+            // Preview shows live camera feed in the viewFinder
+            // Preview resolution is typically optimized for device display
+            // Preview quality doesn't affect captured image quality
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
 
+            // Image capture use case - CAMERA CAPTURE SIZE CONFIGURATION
+            // Current: CAPTURE_MODE_MINIMIZE_LATENCY prioritizes speed over image quality
+            // Default resolution: 640x480 (CameraX default when no target resolution set)
+            // JPEG quality: ~95% (minimize latency mode reduces quality slightly)
+            //
+            // Available configuration options for image capture size:
+            // - setTargetResolution(Size(width, height)): Set specific resolution (e.g., 1920x1080 for Full HD)
+            // - setTargetAspectRatio(AspectRatio.RATIO_16_9): Set aspect ratio (4:3, 16:9, etc.)
+            // - setJpegQuality(quality): Set JPEG quality 1-100 (100 = highest quality)
+            // - setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_LATENCY): Speed priority (current)
+            // - setCaptureMode(ImageCapture.CAPTURE_MODE_QUALITY): Quality priority
+            // - setMaxResolution(Size): Set maximum allowed resolution
+            //
+            // Common resolution options for glasses:
+            // - Size(1920, 1080) - Full HD (best quality, larger file sizes)
+            // - Size(1280, 720) - HD (good balance)
+            // - Size(640, 480) - Default (current, smaller files)
+            // - Size(3840, 2160) - 4K (if hardware supports)
+            //
+            // File size impact:
+            // - 640x480 @ ~95% quality: ~400-500KB
+            // - 1280x720 @ ~95% quality: ~800-1200KB
+            // - 1920x1080 @ ~95% quality: ~1.5-2.5MB
+            // - 1920x1080 @ 100% quality: ~2.5-4MB
+
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                // Add resolution/quality configuration here if needed:
+                // .setTargetResolution(Size(1280, 720))  // Example: HD resolution
+                // .setJpegQuality(100)  // Example: Highest quality
                 .build()
 
             val imageAnalyzer = ImageAnalysis.Builder()
@@ -107,6 +139,8 @@ class CameraFragment : Fragment() {
     }
 
     private fun takePhoto() {
+        // CAPTURE SIZE IS DETERMINED BY THE ImageCapture.Builder() CONFIGURATION
+        // See lines 101-106 above for available size/quality options
         val imageCapture = imageCapture ?: return
 
         val photoFile = createImageFile(requireContext())
