@@ -11,6 +11,57 @@
     <!-- For smart glasses, no preview is needed as you see through the device naturally -->
     <!-- This frees up the entire screen for AR overlays, controls, or information display -->
 
+    <!-- Live Translation Display (Top Center) -->
+    <LinearLayout
+        android:id="@+id/translationContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="#DD000000"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/translationStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎤 LIVE TRANSLATION"
+            android:textColor="#00FF00"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/translationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/modelStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Model: Loading..."
+            android:textColor="#FFFF00"
+            android:textSize="10sp"
+            android:fontFamily="monospace" />
+
+    </LinearLayout>
+
     <!-- Captured Image Preview (overlay) -->
     <ImageView
         android:id="@+id/previewImage"
@@ -54,6 +105,17 @@
             android:background="@drawable/capture_button_background"
             android:contentDescription="Capture photo"
             android:src="@drawable/ic_camera"
+            android:tint="@color/white" />
+
+        <!-- Translation Button -->
+        <ImageButton
+            android:id="@+id/translationButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="24dp"
+            android:background="@drawable/circular_button_background"
+            android:contentDescription="Toggle translation"
+            android:src="@drawable/ic_mic"
             android:tint="@color/white" />
 
         <!-- Switch Camera Button - REMOVED -->

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.camerapp"
-        minSdk 24
+        minSdk 26  // Updated for compatibility with Vosk and modern Android
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -56,6 +56,10 @@ dependencies {
     // Permissions
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
+
+    // Vosk Speech Recognition - Incremental Test 1: Core library + JNA
+    implementation 'org.vosk:vosk-android:0.3.40'
+    implementation 'net.java.dev.jna:jna:5.14.0@aar'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

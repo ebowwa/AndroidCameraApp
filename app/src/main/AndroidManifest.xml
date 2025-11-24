@@ -71,6 +71,13 @@
             android:exported="false"
             android:foregroundServiceType="camera" />
 
+        <!-- Vosk Live Translation Service -->
+        <service
+            android:name=".VoskService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
     </application>
 
 </manifest>

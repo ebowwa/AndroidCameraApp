@@ -1,12 +1,16 @@
 package com.camerapp
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -40,6 +44,56 @@ class CameraFragment : Fragment() {
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var isFlashEnabled = false
 
+    // Vosk Translation Service
+    private var voskService: VoskService? = null
+    private var isVoskBound = false
+    private var isTranslationActive = false
+
+    private val voskConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as VoskService.VoskBinder
+            voskService = binder.getService()
+            isVoskBound = true
+
+            // Set up translation callback
+            voskService?.setTranscriptionCallback(object : VoskService.TranscriptionCallback {
+                override fun onTranscriptionResult(text: String, confidence: Float) {
+                    requireActivity().runOnUiThread {
+                        updateTranslationText(text)
+                    }
+                }
+
+                override fun onError(error: String) {
+                    requireActivity().runOnUiThread {
+                        showTranslationError(error)
+                    }
+                }
+
+                override fun onRecordingStateChanged(isRecording: Boolean) {
+                    requireActivity().runOnUiThread {
+                        updateTranslationStatus(isRecording)
+                    }
+                }
+
+                override fun onModelLoadingProgress(progress: Float) {
+                    requireActivity().runOnUiThread {
+                        updateModelProgress(progress)
+                    }
+                }
+
+                override fun onModelLoaded(success: Boolean) {
+                    requireActivity().runOnUiThread {
+                        updateModelStatus(success)
+                    }
+                }
+            })
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isVoskBound = false
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,7 +110,11 @@ class CameraFragment : Fragment() {
 
         binding.captureButton.setOnClickListener { takePhoto() }
         binding.flashButton.setOnClickListener { toggleFlash() }
+        binding.translationButton.setOnClickListener { toggleTranslation() }
         // Switch camera button removed - glasses use back camera only
+
+        // Bind to Vosk service
+        bindVoskService()
 
         startCamera()
     }
@@ -203,7 +261,95 @@ class CameraFragment : Fragment() {
         super.onDestroyView()
         cameraExecutor.shutdown()
         cameraProvider?.unbindAll()
+
+        // Unbind from Vosk service
+        if (isVoskBound) {
+            requireContext().unbindService(voskConnection)
+            isVoskBound = false
+        }
+
         _binding = null
+    }
+
+    // Vosk Translation Methods
+    private fun bindVoskService() {
+        Intent(requireContext(), VoskService::class.java).also { intent ->
+            requireContext().bindService(intent, voskConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private fun toggleTranslation() {
+        if (isTranslationActive) {
+            stopTranslation()
+        } else {
+            startTranslation()
+        }
+    }
+
+    private fun startTranslation() {
+        if (!isVoskBound) {
+            Toast.makeText(requireContext(), "Translation service not ready", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = Intent(requireContext(), VoskService::class.java).apply {
+            action = "START_TRANSCRIPTION"
+        }
+        requireContext().startService(intent)
+
+        // Show translation UI
+        binding.translationContainer.visibility = View.VISIBLE
+        binding.translationStatusText.text = "🎤 STARTING TRANSLATION..."
+        isTranslationActive = true
+
+        Toast.makeText(requireContext(), "Translation started", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun stopTranslation() {
+        val intent = Intent(requireContext(), VoskService::class.java).apply {
+            action = "STOP_TRANSCRIPTION"
+        }
+        requireContext().startService(intent)
+
+        binding.translationContainer.visibility = View.GONE
+        isTranslationActive = false
+
+        Toast.makeText(requireContext(), "Translation stopped", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun updateTranslationText(text: String) {
+        binding.translationText.text = text
+    }
+
+    private fun showTranslationError(error: String) {
+        binding.translationText.text = "❌ Error: $error"
+        binding.translationStatusText.text = "🔴 TRANSLATION ERROR"
+        Toast.makeText(requireContext(), "Translation error: $error", Toast.LENGTH_LONG).show()
+    }
+
+    private fun updateTranslationStatus(isRecording: Boolean) {
+        if (isRecording) {
+            binding.translationStatusText.text = "🎤 LISTENING..."
+            binding.translationButton.setImageResource(R.drawable.ic_mic_on)
+        } else {
+            binding.translationStatusText.text = "⏸️ PAUSED"
+            binding.translationButton.setImageResource(R.drawable.ic_mic)
+        }
+    }
+
+    private fun updateModelProgress(progress: Float) {
+        val percentage = (progress * 100).toInt()
+        binding.modelStatusText.text = "Model: Loading $percentage%"
+    }
+
+    private fun updateModelStatus(success: Boolean) {
+        if (success) {
+            binding.modelStatusText.text = "Model: Ready ✅"
+            binding.translationStatusText.text = "🎤 READY TO TRANSLATE"
+        } else {
+            binding.modelStatusText.text = "Model: Failed ❌"
+            binding.translationStatusText.text = "❌ MODEL LOAD FAILED"
+        }
     }
 
     companion object {
