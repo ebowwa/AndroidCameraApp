@@ -57,9 +57,8 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
 
-    // Vosk Speech Recognition - Incremental Test 1: Core library + JNA
-    implementation 'org.vosk:vosk-android:0.3.40'
-    implementation 'net.java.dev.jna:jna:5.14.0@aar'
+    // Vosk Speech Recognition - Core library (fixed dependency)
+    implementation 'com.alphacephei:vosk-android:0.3.70'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
