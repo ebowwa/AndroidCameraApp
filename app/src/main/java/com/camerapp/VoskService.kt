@@ -19,8 +19,10 @@ import org.vosk.LogLevel
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URL
+import java.util.zip.ZipInputStream
 
 /**
  * Vosk Service for Live Speech-to-Text Translation
@@ -139,28 +141,52 @@ class VoskService : Service() {
             try {
                 transcriptionCallback?.onModelLoadingProgress(0.1f)
 
-                // For demo purposes, simulate model download
-                // In a real implementation, download and extract the Vosk model
+                // Download real Vosk model
                 val modelPath = File(filesDir, MODEL_NAME)
-                modelPath.mkdirs()
+                val zipFile = File(filesDir, "$MODEL_NAME.zip")
 
-                // Simulate download progress
-                for (i in 1..100) {
-                    delay(50) // Simulate download time
-                    val progress = i / 100f
-                    transcriptionCallback?.onModelLoadingProgress(0.1f + progress * 0.8f)
+                if (modelPath.exists()) {
+                    Log.i(TAG, "Model already exists, loading...")
+                    withContext(Dispatchers.Main) {
+                        loadLocalModel(modelPath)
+                    }
+                    return@launch
                 }
+
+                // Download model file
+                transcriptionCallback?.onModelLoadingProgress(0.2f)
+                val url = URL(MODEL_URL)
+                url.openStream().use { input ->
+                    FileOutputStream(zipFile).use { output ->
+                        val buffer = ByteArray(8192)
+                        var totalBytesRead = 0L
+                        val expectedSize = MODEL_SIZE.toLong()
+
+                        while (true) {
+                            val bytesRead = input.read(buffer)
+                            if (bytesRead == -1) break
+
+                            output.write(buffer, 0, bytesRead)
+                            totalBytesRead += bytesRead
+
+                            val progress = (totalBytesRead.toFloat() / expectedSize).coerceIn(0f, 1f)
+                            transcriptionCallback?.onModelLoadingProgress(0.2f + progress * 0.6f)
+                        }
+                    }
+                }
+
+                transcriptionCallback?.onModelLoadingProgress(0.8f)
+
+                // Extract ZIP file
+                extractZipFile(zipFile, modelPath)
+                zipFile.delete()
 
                 transcriptionCallback?.onModelLoadingProgress(0.9f)
 
-                // Note: In a real implementation, you would:
-                // 1. Download the actual model file from MODEL_URL
-                // 2. Extract the ZIP file
-                // 3. Load the model from the extracted files
-
                 withContext(Dispatchers.Main) {
-                    transcriptionCallback?.onError("Demo mode: Model download simulated")
-                    transcriptionCallback?.onModelLoaded(false)
+                    loadLocalModel(modelPath)
+                    transcriptionCallback?.onModelLoadingProgress(1.0f)
+                    transcriptionCallback?.onModelLoaded(true)
                 }
 
             } catch (e: Exception) {
@@ -183,8 +209,28 @@ class VoskService : Service() {
         }
     }
 
-    // Note: Real model download and extraction would go here
-  // For this demo, we're simulating the process
+    private fun extractZipFile(zipFile: File, outputDir: File) {
+        outputDir.mkdirs()
+        ZipInputStream(FileInputStream(zipFile)).use { zis ->
+            var entry = zis.nextEntry
+            while (entry != null) {
+                val outputFile = File(outputDir, entry.name)
+                if (entry.isDirectory) {
+                    outputFile.mkdirs()
+                } else {
+                    outputFile.parentFile?.mkdirs()
+                    FileOutputStream(outputFile).use { fos ->
+                        val buffer = ByteArray(1024)
+                        var bytesRead: Int
+                        while (zis.read(buffer).also { bytesRead = it } > 0) {
+                            fos.write(buffer, 0, bytesRead)
+                        }
+                    }
+                }
+                entry = zis.nextEntry
+            }
+        }
+    }
 
     private fun startTranscription() {
         val model = this.model ?: run {
@@ -196,31 +242,58 @@ class VoskService : Service() {
             // Create recognizer for continuous recognition
             recognizer = Recognizer(model, SAMPLE_RATE.toFloat())
 
-            // Start simulated transcription job
-            transcriptionJob = serviceScope.launch {
+            // Start real audio recording and transcription
+            transcriptionJob = serviceScope.launch(Dispatchers.IO) {
                 try {
-                    while (isActive) {
-                        // In a real implementation, you would:
-                        // 1. Record audio from microphone
-                        // 2. Send audio chunks to recognizer
-                        // 3. Get results from recognizer
-                        // For now, simulate with demo text
+                    // Initialize AudioRecord for real microphone input
+                    val audioRecord = AudioRecord(
+                        MediaRecorder.AudioSource.MIC,
+                        SAMPLE_RATE,
+                        AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT,
+                        BUFFER_SIZE
+                    )
 
-                        delay(2000) // Wait 2 seconds
-                        val demoText = "Demo: This is a test transcription from Vosk"
-                        transcriptionCallback?.onTranscriptionResult(demoText, 0.9f)
-
-                        delay(3000) // Wait 3 seconds
-                        val demoText2 = "Demo: Speech recognition is working"
-                        transcriptionCallback?.onTranscriptionResult(demoText2, 0.85f)
+                    if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
+                        withContext(Dispatchers.Main) {
+                            transcriptionCallback?.onError("Failed to initialize audio recording")
+                        }
+                        return@launch
                     }
+
+                    audioRecord.startRecording()
+                    Log.i(TAG, "Real audio recording started")
+
+                    val audioBuffer = ByteArray(BUFFER_SIZE)
+
+                    while (isActive) {
+                        val bytesRead = audioRecord.read(audioBuffer, 0, audioBuffer.size)
+
+                        if (bytesRead > 0) {
+                            // Process audio chunk with Vosk recognizer
+                            recognizer?.let { rec ->
+                                if (rec.acceptWaveForm(audioBuffer, bytesRead)) {
+                                    // Check for partial result
+                                    val partialResult = rec.partialResult
+                                    if (partialResult.isNotEmpty()) {
+                                        withContext(Dispatchers.Main) {
+                                            transcriptionCallback?.onTranscriptionResult(partialResult, 0.7f)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error in transcription job", e)
-                    transcriptionCallback?.onError("Transcription error: ${e.message}")
+                    Log.e(TAG, "Error in real transcription", e)
+                    withContext(Dispatchers.Main) {
+                        transcriptionCallback?.onError("Transcription error: ${e.message}")
+                    }
                 }
             }
 
-            Log.i(TAG, "Vosk speech recognition demo started")
+            Log.i(TAG, "Real Vosk speech recognition started")
 
         } catch (e: Exception) {
             Log.e(TAG, "Error starting speech recognition", e)
@@ -236,7 +309,7 @@ class VoskService : Service() {
         // Clean up recognizer
         recognizer?.let { rec ->
             try {
-                // In real implementation, cleanup would go here
+                rec.close()
             } catch (e: Exception) {
                 Log.e(TAG, "Error stopping recognizer", e)
             } finally {
@@ -244,7 +317,7 @@ class VoskService : Service() {
             }
         }
 
-        Log.i(TAG, "Vosk speech recognition stopped")
+        Log.i(TAG, "Real Vosk speech recognition stopped")
     }
 
     private fun cleanup() {
