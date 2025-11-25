@@ -25,7 +25,6 @@ class SettingsFragment : Fragment() {
     private lateinit var progressText: TextView
     private lateinit var cameraOrientationSpinner: Spinner
     private lateinit var imageQualitySpinner: Spinner
-    private lateinit var defaultFlashCheckBox: CheckBox
     private lateinit var autoStartTranslationCheckBox: CheckBox
     private lateinit var confidenceSeekBar: SeekBar
     private lateinit var confidenceValueText: TextView
@@ -48,7 +47,6 @@ class SettingsFragment : Fragment() {
         private const val PREFS_NAME = "camera_settings"
         private const val KEY_CAMERA_ORIENTATION = "camera_orientation"
         private const val KEY_IMAGE_QUALITY = "image_quality"
-        private const val KEY_DEFAULT_FLASH = "default_flash"
         private const val KEY_AUTO_START_TRANSLATION = "auto_start_translation"
         private const val KEY_CONFIDENCE_THRESHOLD = "confidence_threshold"
     }
@@ -92,7 +90,6 @@ class SettingsFragment : Fragment() {
         // Camera Configuration
         cameraOrientationSpinner = view.findViewById(R.id.cameraOrientationSpinner)
         imageQualitySpinner = view.findViewById(R.id.imageQualitySpinner)
-        defaultFlashCheckBox = view.findViewById(R.id.defaultFlashCheckBox)
 
         // Translation Settings
         autoStartTranslationCheckBox = view.findViewById(R.id.autoStartTranslationCheckBox)
@@ -254,9 +251,7 @@ class SettingsFragment : Fragment() {
         val qualityIndex = prefs.getInt(KEY_IMAGE_QUALITY, 0)
         imageQualitySpinner.setSelection(qualityIndex)
 
-        // Default Flash
-        defaultFlashCheckBox.isChecked = prefs.getBoolean(KEY_DEFAULT_FLASH, false)
-
+        
         // Auto-start Translation
         autoStartTranslationCheckBox.isChecked = prefs.getBoolean(KEY_AUTO_START_TRANSLATION, false)
 
@@ -270,7 +265,6 @@ class SettingsFragment : Fragment() {
         prefs.edit().apply {
             putInt(KEY_CAMERA_ORIENTATION, cameraOrientationSpinner.selectedItemPosition)
             putInt(KEY_IMAGE_QUALITY, imageQualitySpinner.selectedItemPosition)
-            putBoolean(KEY_DEFAULT_FLASH, defaultFlashCheckBox.isChecked)
             putBoolean(KEY_AUTO_START_TRANSLATION, autoStartTranslationCheckBox.isChecked)
             putInt(KEY_CONFIDENCE_THRESHOLD, confidenceSeekBar.progress)
             apply()
@@ -296,10 +290,7 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    fun shouldEnableFlashByDefault(): Boolean {
-        return prefs.getBoolean(KEY_DEFAULT_FLASH, false)
-    }
-
+    
     fun shouldAutoStartTranslation(): Boolean {
         return prefs.getBoolean(KEY_AUTO_START_TRANSLATION, false)
     }

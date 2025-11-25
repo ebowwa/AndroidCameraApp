@@ -159,15 +159,7 @@
             android:layout_marginBottom="16dp"
             android:background="#FF404040" />
 
-        <!-- Flash Default -->
-        <CheckBox
-            android:id="@+id/defaultFlashCheckBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Enable flash by default"
-            android:textColor="@color/white"
-            android:layout_marginBottom="8dp" />
-
+  
     </LinearLayout>
 
     <!-- Translation Settings Section -->

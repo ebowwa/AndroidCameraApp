@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(adb install:*)"
+      "Bash(adb install:*)",
+      "Bash(adb shell input tap:*)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

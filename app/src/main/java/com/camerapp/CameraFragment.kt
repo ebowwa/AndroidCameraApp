@@ -42,7 +42,8 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
     private var cameraProvider: ProcessCameraProvider? = null
     private var camera: Camera? = null
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-    private var isFlashEnabled = false
+    // Flash removed - glasses have no flash
+    // private var isFlashEnabled = false
 
     // Speech Recognition Service - Removed transcription model (will be replaced later)
     // private var transcriptionService: TranscriptionService? = null
@@ -113,7 +114,8 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         binding.captureButton.setOnClickListener { takePhoto() }
-        binding.flashButton.setOnClickListener { toggleFlash() }
+        // Flash button removed - glasses have no flash
+        // binding.flashButton.setOnClickListener { toggleFlash() }
         binding.translationButton.setOnClickListener {
             // Show UI state change then error
             binding.translationContainer.visibility = View.VISIBLE
@@ -202,7 +204,8 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
                     this, cameraSelector, imageCapture  // ImageCapture only - headless operation
                 )
 
-                // Set flash button based on camera capabilities
+                // Flash button logic removed - glasses have no flash
+                /*
                 camera?.cameraInfo?.let { cameraInfo ->
                     val hasFlash = cameraInfo.hasFlashUnit()
                     // Check if binding is still valid (fragment not destroyed)
@@ -210,6 +213,7 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
                         binding.flashButton.visibility = if (hasFlash) View.VISIBLE else View.GONE
                     }
                 }
+                */
 
             } catch (exc: Exception) {
                 Log.e("CameraX", "Use case binding failed", exc)
@@ -258,6 +262,8 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
     // switchCamera() function removed - glasses use back camera only
     // No camera switching functionality needed
 
+    // Flash functionality removed - glasses have no flash
+    /*
     private fun toggleFlash() {
         val camera = camera ?: return
 
@@ -275,6 +281,7 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
             Log.e("CameraX", "Failed to toggle flash", e)
         }
     }
+    */
 
     private fun showCapturedImagePreview(photoFile: File) {
         lifecycleScope.launch {

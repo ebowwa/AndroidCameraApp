@@ -86,7 +86,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Flash Button -->
+        <!-- Flash Button Removed - Glasses have no flash -->
+        <!--
         <ImageButton
             android:id="@+id/flashButton"
             android:layout_width="56dp"
@@ -96,6 +97,7 @@
             android:contentDescription="Toggle flash"
             android:src="@drawable/ic_flash_off"
             android:tint="@color/white" />
+        -->
 
         <!-- Capture Button -->
         <ImageButton
