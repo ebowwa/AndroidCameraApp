@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FF1E1E1E">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Model Management Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FF2D2D2D"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Speech Recognition Model"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Model Status -->
+        <TextView
+            android:id="@+id/modelStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Model: Not downloaded"
+            android:textSize="14sp"
+            android:textColor="#CCCCCC"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Model Size -->
+        <TextView
+            android:id="@+id/modelSizeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Size: 40MB"
+            android:textSize="12sp"
+            android:textColor="#AAAAAA"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Model Action Buttons - Available but will show error on click -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/downloadModelButton"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Download Model"
+                android:textSize="12sp"
+                android:background="@drawable/button_background"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/deleteModelButton"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Delete Model"
+                android:textSize="12sp"
+                android:background="@drawable/button_background"
+                android:textColor="@color/white"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+        <!-- Download Progress - Hidden since speech recognition is disabled -->
+        <ProgressBar
+            android:id="@+id/downloadProgress"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleHorizontal" />
+
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="12sp"
+            android:textColor="#FFFFAA"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- Camera Configuration Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FF2D2D2D"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Camera Configuration"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Camera Orientation -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Camera Orientation"
+            android:textSize="14sp"
+            android:textColor="#CCCCCC"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/cameraOrientationSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="16dp"
+            android:background="#FF404040" />
+
+        <!-- Image Quality -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Image Quality"
+            android:textSize="14sp"
+            android:textColor="#CCCCCC"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/imageQualitySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="16dp"
+            android:background="#FF404040" />
+
+        <!-- Flash Default -->
+        <CheckBox
+            android:id="@+id/defaultFlashCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable flash by default"
+            android:textColor="@color/white"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+
+    <!-- Translation Settings Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FF2D2D2D"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Translation Settings"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Auto-start Translation -->
+        <CheckBox
+            android:id="@+id/autoStartTranslationCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Auto-start translation on app launch"
+            android:textColor="@color/white"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Confidence Threshold -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recognition Confidence Threshold"
+            android:textSize="14sp"
+            android:textColor="#CCCCCC"
+            android:layout_marginBottom="8dp" />
+
+        <SeekBar
+            android:id="@+id/confidenceSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="70"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/confidenceValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="70%"
+            android:textSize="12sp"
+            android:textColor="#AAAAAA"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Save Settings"
+            android:background="@drawable/primary_button_background"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Reset to Defaults"
+            android:background="@drawable/button_background"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

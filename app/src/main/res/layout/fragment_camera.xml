@@ -135,7 +135,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Optional: Add settings button here if needed -->
+        <!-- Settings Button -->
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/circular_button_background"
+            android:contentDescription="Settings"
+            android:src="@drawable/ic_settings"
+            android:tint="@color/white" />
 
     </LinearLayout>
 

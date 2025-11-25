@@ -32,7 +32,7 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class CameraFragment : Fragment() {
+class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
 
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
@@ -44,19 +44,22 @@ class CameraFragment : Fragment() {
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var isFlashEnabled = false
 
-    // Vosk Translation Service
-    private var voskService: VoskService? = null
-    private var isVoskBound = false
-    private var isTranslationActive = false
+    // Speech Recognition Service - Removed Vosk (will be replaced later)
+    // private var speechService: SpeechService? = null
+    // private var isSpeechBound = false
+    // private var isTranslationActive = false
+    private var currentSettingsFragment: SettingsFragment? = null
 
-    private val voskConnection = object : ServiceConnection {
+    // Speech Recognition Connection - Removed Vosk (will be replaced later)
+    /*
+    private val speechConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as VoskService.VoskBinder
-            voskService = binder.getService()
-            isVoskBound = true
+            val binder = service as SpeechService.SpeechBinder
+            speechService = binder.getService()
+            isSpeechBound = true
 
-            // Set up translation callback
-            voskService?.setTranscriptionCallback(object : VoskService.TranscriptionCallback {
+            // Set up transcription callback
+            speechService?.setTranscriptionCallback(object : SpeechService.TranscriptionCallback {
                 override fun onTranscriptionResult(text: String, confidence: Float) {
                     requireActivity().runOnUiThread {
                         updateTranslationText(text)
@@ -90,9 +93,10 @@ class CameraFragment : Fragment() {
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            isVoskBound = false
+            isSpeechBound = false
         }
     }
+    */
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -110,11 +114,32 @@ class CameraFragment : Fragment() {
 
         binding.captureButton.setOnClickListener { takePhoto() }
         binding.flashButton.setOnClickListener { toggleFlash() }
-        binding.translationButton.setOnClickListener { toggleTranslation() }
+        binding.translationButton.setOnClickListener {
+            // Show UI state change then error
+            binding.translationContainer.visibility = View.VISIBLE
+            binding.translationStatusText.text = "🔴 STARTING..."
+            binding.translationStatusText.setTextColor(android.graphics.Color.YELLOW)
+            binding.translationText.text = ""
+
+            // Simulate starting then show error
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                binding.translationStatusText.text = "🔴 TRANSLATION ERROR"
+                binding.translationStatusText.setTextColor(android.graphics.Color.RED)
+                binding.translationText.text = "❌ Speech recognition service unavailable"
+
+                Toast.makeText(requireContext(), "Failed to start: Service unavailable", Toast.LENGTH_LONG).show()
+
+                // Hide after delay
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    binding.translationContainer.visibility = View.GONE
+                }, 4000)
+            }, 2000)
+        }
+        binding.settingsButton.setOnClickListener { openSettings() }
         // Switch camera button removed - glasses use back camera only
 
-        // Bind to Vosk service
-        bindVoskService()
+        // Speech Recognition Service - Removed Vosk (will be replaced later)
+        // bindSpeechService()
 
         startCamera()
     }
@@ -180,7 +205,10 @@ class CameraFragment : Fragment() {
                 // Set flash button based on camera capabilities
                 camera?.cameraInfo?.let { cameraInfo ->
                     val hasFlash = cameraInfo.hasFlashUnit()
-                    binding.flashButton.visibility = if (hasFlash) View.VISIBLE else View.GONE
+                    // Check if binding is still valid (fragment not destroyed)
+                    _binding?.let { binding ->
+                        binding.flashButton.visibility = if (hasFlash) View.VISIBLE else View.GONE
+                    }
                 }
 
             } catch (exc: Exception) {
@@ -262,19 +290,25 @@ class CameraFragment : Fragment() {
         cameraExecutor.shutdown()
         cameraProvider?.unbindAll()
 
-        // Unbind from Vosk service
-        if (isVoskBound) {
-            requireContext().unbindService(voskConnection)
-            isVoskBound = false
+        // Clear settings fragment reference
+        currentSettingsFragment = null
+
+        // Speech Recognition Service - Removed Vosk (will be replaced later)
+        /*
+        if (isSpeechBound) {
+            requireContext().unbindService(speechConnection)
+            isSpeechBound = false
         }
+        */
 
         _binding = null
     }
 
-    // Vosk Translation Methods
-    private fun bindVoskService() {
-        Intent(requireContext(), VoskService::class.java).also { intent ->
-            requireContext().bindService(intent, voskConnection, Context.BIND_AUTO_CREATE)
+    // Speech Recognition Methods - Removed Vosk (will be replaced later)
+    /*
+    private fun bindSpeechService() {
+        Intent(requireContext(), SpeechService::class.java).also { intent ->
+            requireContext().bindService(intent, speechConnection, Context.BIND_AUTO_CREATE)
         }
     }
 
@@ -287,12 +321,12 @@ class CameraFragment : Fragment() {
     }
 
     private fun startTranslation() {
-        if (!isVoskBound) {
+        if (!isSpeechBound) {
             Toast.makeText(requireContext(), "Translation service not ready", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val intent = Intent(requireContext(), VoskService::class.java).apply {
+        val intent = Intent(requireContext(), SpeechService::class.java).apply {
             action = "START_TRANSCRIPTION"
         }
         requireContext().startService(intent)
@@ -306,7 +340,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun stopTranslation() {
-        val intent = Intent(requireContext(), VoskService::class.java).apply {
+        val intent = Intent(requireContext(), SpeechService::class.java).apply {
             action = "STOP_TRANSCRIPTION"
         }
         requireContext().startService(intent)
@@ -339,18 +373,30 @@ class CameraFragment : Fragment() {
 
     private fun updateModelProgress(progress: Float) {
         val percentage = (progress * 100).toInt()
-        binding.modelStatusText.text = "Model: Loading $percentage%"
+        Log.d("CameraFragment", "Model download progress: $percentage%")
+
+        // Pass progress to settings fragment if it's active
+        currentSettingsFragment?.let { settings ->
+            try {
+                requireActivity().runOnUiThread {
+                    settings.updateDownloadProgress(percentage)
+                }
+            } catch (e: Exception) {
+                Log.e("CameraFragment", "Failed to update settings progress", e)
+            }
+        }
     }
 
     private fun updateModelStatus(success: Boolean) {
+        // Model status is handled by SettingsFragment
+        // This method is kept for compatibility but doesn't update UI
         if (success) {
-            binding.modelStatusText.text = "Model: Ready ✅"
-            binding.translationStatusText.text = "🎤 READY TO TRANSLATE"
+            Log.d("CameraFragment", "Model loaded successfully")
         } else {
-            binding.modelStatusText.text = "Model: Failed ❌"
-            binding.translationStatusText.text = "❌ MODEL LOAD FAILED"
+            Log.d("CameraFragment", "Model loading failed")
         }
     }
+    */
 
     companion object {
         private fun createImageFile(context: Context): File {
@@ -408,5 +454,83 @@ class CameraFragment : Fragment() {
                 Unit
             }
         }
+    }
+
+    // Settings Fragment Interface Implementation
+    private fun openSettings() {
+        val settingsFragment = SettingsFragment.newInstance()
+        currentSettingsFragment = settingsFragment
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.cameraContainer, settingsFragment)
+            .addToBackStack("settings")
+            .commit()
+    }
+
+    // Model Management Interface - Removed Vosk (will be replaced later)
+    override fun downloadModel() {
+        Log.d("CameraFragment", "downloadModel() called - speech recognition disabled")
+        Toast.makeText(requireContext(), "Speech recognition temporarily disabled", Toast.LENGTH_SHORT).show()
+        /*
+        Log.d("CameraFragment", "downloadModel() called - starting SpeechService")
+        val intent = Intent(requireContext(), SpeechService::class.java).apply {
+            action = "DOWNLOAD_MODEL"
+        }
+
+        try {
+            requireContext().startService(intent)
+            Log.d("CameraFragment", "SpeechService started successfully")
+        } catch (e: Exception) {
+            Log.e("CameraFragment", "Failed to start SpeechService: ${e.message}", e)
+            Toast.makeText(requireContext(), "Failed to start model download", Toast.LENGTH_LONG).show()
+        }
+        */
+    }
+
+    override fun deleteModel() {
+        Toast.makeText(requireContext(), "Speech recognition temporarily disabled", Toast.LENGTH_SHORT).show()
+        /*
+        val modelPath = File(requireContext().filesDir, "speech-model")
+        val deleted = modelPath.deleteRecursively()
+
+        if (deleted) {
+            Toast.makeText(requireContext(), "Model deleted successfully", Toast.LENGTH_SHORT).show()
+            // Stop the service to clear any loaded model
+            val intent = Intent(requireContext(), SpeechService::class.java).apply {
+                action = "STOP_TRANSCRIPTION"
+            }
+            requireContext().startService(intent)
+        } else {
+            Toast.makeText(requireContext(), "Failed to delete model", Toast.LENGTH_SHORT).show()
+        }
+        */
+    }
+
+    override fun isModelDownloaded(): Boolean {
+        // Always return false since speech recognition is disabled
+        return false
+        /*
+        val modelPath = File(requireContext().filesDir, "speech-model")
+        if (!modelPath.exists()) return false
+
+        // Check for required model files
+        val requiredFiles = listOf("model.bin", "conf")
+        return requiredFiles.all { File(modelPath, it).exists() }
+        */
+    }
+
+    override fun getModelSize(): String {
+        // Return placeholder since speech recognition is disabled
+        return "Speech recognition disabled"
+        /*
+        val modelPath = File(requireContext().filesDir, "speech-model")
+        if (!modelPath.exists()) return "Speech recognition disabled"
+
+        return try {
+            val size = modelPath.walkTopDown().filter { it.isFile }.map { it.length() }.sum()
+            "${size / (1024 * 1024)}MB"
+        } catch (e: Exception) {
+            "Speech recognition disabled"
+        }
+        */
     }
 }
