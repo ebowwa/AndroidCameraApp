@@ -76,9 +76,9 @@
             android:exported="false"
             android:foregroundServiceType="camera" />
 
-        <!-- Speech Recognition Service - Removed Vosk (will be replaced later) -->
+        <!-- Speech Recognition Service - Removed transcription model (will be replaced later) -->
         <!-- <service
-            android:name=".VoskService"
+            android:name=".TranscriptionService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="microphone" /> -->

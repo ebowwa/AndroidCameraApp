@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.camerapp"
-        minSdk 26  // Updated for compatibility with Vosk and modern Android
+        minSdk 26  // Updated for compatibility with transcription model and modern Android
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -57,8 +57,8 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
 
-    // Speech Recognition - Removed Vosk (will be replaced later)
-    // implementation 'com.alphacephei:vosk-android:0.3.70'
+    // Speech Recognition - Removed transcription model (will be replaced later)
+    // implementation 'com.example:transcription-model:0.3.70'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -44,22 +44,22 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var isFlashEnabled = false
 
-    // Speech Recognition Service - Removed Vosk (will be replaced later)
-    // private var speechService: SpeechService? = null
-    // private var isSpeechBound = false
+    // Speech Recognition Service - Removed transcription model (will be replaced later)
+    // private var transcriptionService: TranscriptionService? = null
+    // private var isTranscriptionBound = false
     // private var isTranslationActive = false
     private var currentSettingsFragment: SettingsFragment? = null
 
-    // Speech Recognition Connection - Removed Vosk (will be replaced later)
+    // Speech Recognition Connection - Removed transcription model (will be replaced later)
     /*
-    private val speechConnection = object : ServiceConnection {
+    private val transcriptionConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as SpeechService.SpeechBinder
-            speechService = binder.getService()
-            isSpeechBound = true
+            val binder = service as TranscriptionService.TranscriptionBinder
+            transcriptionService = binder.getService()
+            isTranscriptionBound = true
 
             // Set up transcription callback
-            speechService?.setTranscriptionCallback(object : SpeechService.TranscriptionCallback {
+            transcriptionService?.setTranscriptionCallback(object : TranscriptionService.TranscriptionCallback {
                 override fun onTranscriptionResult(text: String, confidence: Float) {
                     requireActivity().runOnUiThread {
                         updateTranslationText(text)
@@ -93,7 +93,7 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            isSpeechBound = false
+            isTranscriptionBound = false
         }
     }
     */
@@ -138,8 +138,8 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
         binding.settingsButton.setOnClickListener { openSettings() }
         // Switch camera button removed - glasses use back camera only
 
-        // Speech Recognition Service - Removed Vosk (will be replaced later)
-        // bindSpeechService()
+        // Speech Recognition Service - Removed transcription model (will be replaced later)
+        // bindTranscriptionService()
 
         startCamera()
     }
@@ -293,22 +293,22 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
         // Clear settings fragment reference
         currentSettingsFragment = null
 
-        // Speech Recognition Service - Removed Vosk (will be replaced later)
+        // Speech Recognition Service - Removed transcription model (will be replaced later)
         /*
-        if (isSpeechBound) {
-            requireContext().unbindService(speechConnection)
-            isSpeechBound = false
+        if (isTranscriptionBound) {
+            requireContext().unbindService(transcriptionConnection)
+            isTranscriptionBound = false
         }
         */
 
         _binding = null
     }
 
-    // Speech Recognition Methods - Removed Vosk (will be replaced later)
+    // Speech Recognition Methods - Removed transcription model (will be replaced later)
     /*
-    private fun bindSpeechService() {
-        Intent(requireContext(), SpeechService::class.java).also { intent ->
-            requireContext().bindService(intent, speechConnection, Context.BIND_AUTO_CREATE)
+    private fun bindTranscriptionService() {
+        Intent(requireContext(), TranscriptionService::class.java).also { intent ->
+            requireContext().bindService(intent, transcriptionConnection, Context.BIND_AUTO_CREATE)
         }
     }
 
@@ -321,12 +321,12 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
     }
 
     private fun startTranslation() {
-        if (!isSpeechBound) {
+        if (!isTranscriptionBound) {
             Toast.makeText(requireContext(), "Translation service not ready", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val intent = Intent(requireContext(), SpeechService::class.java).apply {
+        val intent = Intent(requireContext(), TranscriptionService::class.java).apply {
             action = "START_TRANSCRIPTION"
         }
         requireContext().startService(intent)
@@ -340,7 +340,7 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
     }
 
     private fun stopTranslation() {
-        val intent = Intent(requireContext(), SpeechService::class.java).apply {
+        val intent = Intent(requireContext(), TranscriptionService::class.java).apply {
             action = "STOP_TRANSCRIPTION"
         }
         requireContext().startService(intent)
@@ -466,21 +466,21 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
             .commit()
     }
 
-    // Model Management Interface - Removed Vosk (will be replaced later)
+    // Model Management Interface - Removed transcription model (will be replaced later)
     override fun downloadModel() {
         Log.d("CameraFragment", "downloadModel() called - speech recognition disabled")
         Toast.makeText(requireContext(), "Speech recognition temporarily disabled", Toast.LENGTH_SHORT).show()
         /*
-        Log.d("CameraFragment", "downloadModel() called - starting SpeechService")
-        val intent = Intent(requireContext(), SpeechService::class.java).apply {
+        Log.d("CameraFragment", "downloadModel() called - starting TranscriptionService")
+        val intent = Intent(requireContext(), TranscriptionService::class.java).apply {
             action = "DOWNLOAD_MODEL"
         }
 
         try {
             requireContext().startService(intent)
-            Log.d("CameraFragment", "SpeechService started successfully")
+            Log.d("CameraFragment", "TranscriptionService started successfully")
         } catch (e: Exception) {
-            Log.e("CameraFragment", "Failed to start SpeechService: ${e.message}", e)
+            Log.e("CameraFragment", "Failed to start TranscriptionService: ${e.message}", e)
             Toast.makeText(requireContext(), "Failed to start model download", Toast.LENGTH_LONG).show()
         }
         */
@@ -489,13 +489,13 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
     override fun deleteModel() {
         Toast.makeText(requireContext(), "Speech recognition temporarily disabled", Toast.LENGTH_SHORT).show()
         /*
-        val modelPath = File(requireContext().filesDir, "speech-model")
+        val modelPath = File(requireContext().filesDir, "transcription-model")
         val deleted = modelPath.deleteRecursively()
 
         if (deleted) {
             Toast.makeText(requireContext(), "Model deleted successfully", Toast.LENGTH_SHORT).show()
             // Stop the service to clear any loaded model
-            val intent = Intent(requireContext(), SpeechService::class.java).apply {
+            val intent = Intent(requireContext(), TranscriptionService::class.java).apply {
                 action = "STOP_TRANSCRIPTION"
             }
             requireContext().startService(intent)
@@ -509,7 +509,7 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
         // Always return false since speech recognition is disabled
         return false
         /*
-        val modelPath = File(requireContext().filesDir, "speech-model")
+        val modelPath = File(requireContext().filesDir, "transcription-model")
         if (!modelPath.exists()) return false
 
         // Check for required model files
@@ -522,7 +522,7 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
         // Return placeholder since speech recognition is disabled
         return "Speech recognition disabled"
         /*
-        val modelPath = File(requireContext().filesDir, "speech-model")
+        val modelPath = File(requireContext().filesDir, "transcription-model")
         if (!modelPath.exists()) return "Speech recognition disabled"
 
         return try {
@@ -532,5 +532,6 @@ class CameraFragment : Fragment(), SettingsFragment.ModelManagementListener {
             "Speech recognition disabled"
         }
         */
+    }
     }
 }
