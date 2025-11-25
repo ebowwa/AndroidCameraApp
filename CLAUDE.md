@@ -1,17 +1,17 @@
 Camera App for INMO IMA301 Glasses
 
-This is a camera app built specifically for the INMO IMA301 smart glasses. Since you can see directly through the glasses, the app runs in headless mode - no camera preview needed.
+Main focus is building the UI layer first for smart glasses. We're doing headless camera operation since you see directly through the glasses - no preview display needed.
 
-Working features:
-Camera captures photos without any preview display
-Settings screen for camera orientation and image quality
-Speech recognition UI that shows errors when used instead of being disabled
-Background service for other apps to trigger camera captures
-API integration through broadcast receivers
+Current UI work:
+Camera controls and settings interface working
+Speech recognition UI that shows proper error states instead of being disabled upfront
+Settings screen for camera orientation and image quality configuration
+Background service UI integration for external app camera triggers
 
-What's not working:
-Speech recognition - the UI exists but shows "service unavailable" errors
-No flash functionality (the glasses don't have flash)
+Camera functionality status:
+Basic photo capture working in headless mode
+Speech recognition shows "service unavailable" errors when accessed (intentional)
+No flash functionality removed (glasses don't have flash)
 No front camera switching (glasses only have back camera)
 
 Build and install:
