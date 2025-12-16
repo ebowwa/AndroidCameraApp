@@ -73,6 +73,12 @@ class CameraFragment : Fragment() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
+            // Check if binding is still valid (fragment may have been destroyed)
+            if (_binding == null) {
+                Log.d("CameraFragment", "Binding is null, skipping camera setup")
+                return@addListener
+            }
+            
             cameraProvider = cameraProviderFuture.get()
 
             // Preview use case - CAMERA PREVIEW CONFIGURATION
@@ -134,9 +140,12 @@ class CameraFragment : Fragment() {
                 )
 
                 // Set flash button based on camera capabilities
-                camera?.cameraInfo?.let { cameraInfo ->
-                    val hasFlash = cameraInfo.hasFlashUnit()
-                    binding.flashButton.visibility = if (hasFlash) View.VISIBLE else View.GONE
+                // Check binding again before accessing UI
+                if (_binding != null) {
+                    camera?.cameraInfo?.let { cameraInfo ->
+                        val hasFlash = cameraInfo.hasFlashUnit()
+                        binding.flashButton.visibility = if (hasFlash) View.VISIBLE else View.GONE
+                    }
                 }
 
             } catch (exc: Exception) {

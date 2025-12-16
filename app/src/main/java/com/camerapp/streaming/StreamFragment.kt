@@ -24,6 +24,8 @@ import androidx.lifecycle.lifecycleScope
 import com.camerapp.R
 import com.camerapp.databinding.FragmentStreamBinding
 import io.github.thibaultbee.streampack.core.configuration.mediadescriptor.UriMediaDescriptor
+import io.github.thibaultbee.streampack.core.elements.sources.audio.audiorecord.MicrophoneSourceFactory
+import io.github.thibaultbee.streampack.core.elements.sources.video.camera.CameraSourceFactory
 import io.github.thibaultbee.streampack.core.interfaces.IWithVideoSource
 import io.github.thibaultbee.streampack.core.interfaces.startPreview
 import io.github.thibaultbee.streampack.core.interfaces.startStream
@@ -147,6 +149,11 @@ class StreamFragment : Fragment() {
                 )
 
                 streamer?.let { s ->
+                    // Set audio and video sources FIRST
+                    s.setAudioSource(MicrophoneSourceFactory())
+                    s.setVideoSource(CameraSourceFactory())
+                    
+                    // Then configure
                     s.setAudioConfig(audioConfig)
                     s.setVideoConfig(videoConfig)
 
@@ -157,6 +164,10 @@ class StreamFragment : Fragment() {
                     (s as? IWithVideoSource)?.startPreview(surface)
 
                     Log.d(TAG, "Streamer initialized successfully")
+                    
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Camera ready", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to initialize streamer", e)
@@ -173,22 +184,31 @@ class StreamFragment : Fragment() {
 
     private fun startStream() {
         val url = rtmpUrl
-        if (url.isBlank() || url == DEFAULT_RTMP_URL) {
+        Log.d(TAG, "startStream called, URL: $url, streamer: $streamer")
+        
+        if (url.isBlank()) {
             Toast.makeText(requireContext(), "Please set RTMP URL first", Toast.LENGTH_SHORT).show()
             showRtmpUrlDialog()
+            return
+        }
+        
+        if (streamer == null) {
+            Log.e(TAG, "Streamer is null!")
+            Toast.makeText(requireContext(), "Camera not ready yet, please wait", Toast.LENGTH_LONG).show()
             return
         }
 
         lifecycleScope.launch {
             try {
                 Log.d(TAG, "Starting stream to: $url")
+                Toast.makeText(requireContext(), "Connecting to $url...", Toast.LENGTH_SHORT).show()
 
                 streamer?.startStream(UriMediaDescriptor(url))
 
                 isStreaming = true
                 withContext(Dispatchers.Main) {
                     updateStreamingUI(true)
-                    Toast.makeText(requireContext(), "Streaming started", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Streaming started!", Toast.LENGTH_SHORT).show()
                 }
                 Log.d(TAG, "Stream started successfully")
             } catch (e: Exception) {
@@ -198,7 +218,7 @@ class StreamFragment : Fragment() {
                     updateStreamingUI(false)
                     Toast.makeText(
                         requireContext(),
-                        "Failed to start stream: ${e.message}",
+                        "Stream error: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -246,11 +266,7 @@ class StreamFragment : Fragment() {
 
     private fun updateRtmpUrlDisplay() {
         val url = rtmpUrl
-        binding.rtmpUrlText.text = if (url == DEFAULT_RTMP_URL) {
-            "Tap to set RTMP URL"
-        } else {
-            url
-        }
+        binding.rtmpUrlText.text = url
     }
 
     private fun showRtmpUrlDialog() {
@@ -299,6 +315,6 @@ class StreamFragment : Fragment() {
     companion object {
         private const val TAG = "StreamFragment"
         private const val PREF_RTMP_URL = "rtmp_url"
-        private const val DEFAULT_RTMP_URL = "rtmp://localhost:1935/live/stream"
+        private const val DEFAULT_RTMP_URL = "rtmp://4.tcp.us-cal-1.ngrok.io:14031/live/stream"
     }
 }
