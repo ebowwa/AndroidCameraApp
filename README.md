@@ -171,6 +171,17 @@ ffplay rtmp://localhost:1935/live/stream
 
 **Note**: This assumes you are running a local RTMP server (like MediaMTX) and tunneling via `ngrok` if testing remotely. The app defaults to the configured RTMP URL.
 
+### Stream Architecture
+The current implementation is **unidirectional** (One-way):
+`Glasses (Camera/Mic) -> Internet (ngrok) -> MediaMTX Server -> Desktop (ffplay)`
+
+The app acts purely as a **Publisher**. It captures video/audio and pushes it out. It does not currently receive or play back streams.
+
+**Future Bidirectional Options:**
+- **Video/Audio Return**: Implement a player (e.g., ExoPlayer) to subscribe to a separate return stream.
+- **Commands**: Use a separate socket connection or MQTT.
+- **Low-Latency 2-Way**: Switch protocol from RTMP to WebRTC.
+
 ## 📝 Development Notes
 
 ### Key Architecture Decisions
