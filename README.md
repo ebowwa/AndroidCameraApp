@@ -158,6 +158,19 @@ The app has been successfully deployed and tested on:
 - **Package**: `com.camerapp`
 - **Status**: ✅ Working with live camera preview
 
+## 📡 Live Streaming
+
+The app supports RTMP live streaming using StreamPack.
+
+### Viewing the Stream
+To view the stream on your computer via the command line (CLI), ensure you have `ffmpeg` installed and run:
+
+```bash
+ffplay rtmp://localhost:1935/live/stream
+```
+
+**Note**: This assumes you are running a local RTMP server (like MediaMTX) and tunneling via `ngrok` if testing remotely. The app defaults to the configured RTMP URL.
+
 ## 📝 Development Notes
 
 ### Key Architecture Decisions
