@@ -218,6 +218,46 @@
 
     </LinearLayout>
 
+    <!-- Stream Settings Section (Future Integration) -->
+    <!--
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FF2D2D2D"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stream Settings"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RTMP Endpoint URL"
+            android:textSize="14sp"
+            android:textColor="#CCCCCC"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/streamUrlInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF404040"
+            android:textColor="@color/white"
+            android:padding="8dp"
+            android:hint="rtmp://server/live/stream_key"
+            android:textColorHint="#888888"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+    -->
+
     <!-- Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"

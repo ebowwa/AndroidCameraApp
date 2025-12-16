@@ -58,7 +58,7 @@ This represents a fundamental shift in how we think about user interfaces—not 
 
 Build and install:
 ./gradlew assembleDebug
-adb connect 172.20.10.2:5555
+adb connect 172.20.10.2:5555 //wrong plugged in not wifi
 adb install app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n com.camerapp/.MainActivity
 
@@ -68,9 +68,3 @@ adb shell am broadcast -a com.camerapp.CAPTURE_PHOTO
 
 Check if app is running:
 adb shell ps | grep camerapp
-
-Project structure:
-CameraFragment.kt - Main camera logic using headless CameraX
-SettingsFragment.kt - Camera settings UI
-CameraTriggerService.kt - Background camera service
-docs/HEADLESS_CAMERA_MODE.md - Detailed headless camera implementation notes

@@ -1,4 +1,4 @@
-package com.camerapp
+package com.camerapp.ui
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.camerapp.R
+import com.camerapp.settings.AppPreferences
 import kotlinx.coroutines.launch
 
-class SettingsFragment : Fragment() {
+class SettingsScreen : Fragment() {
 
-    private lateinit var prefs: SharedPreferences
+    private lateinit var appPreferences: AppPreferences
     private var modelManagementListener: ModelManagementListener? = null
 
     // UI Components
@@ -39,21 +41,14 @@ class SettingsFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): SettingsFragment {
-            return SettingsFragment()
+        fun newInstance(): SettingsScreen {
+            return SettingsScreen()
         }
-
-        // Preference keys
-        private const val PREFS_NAME = "camera_settings"
-        private const val KEY_CAMERA_ORIENTATION = "camera_orientation"
-        private const val KEY_IMAGE_QUALITY = "image_quality"
-        private const val KEY_AUTO_START_TRANSLATION = "auto_start_translation"
-        private const val KEY_CONFIDENCE_THRESHOLD = "confidence_threshold"
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        appPreferences = AppPreferences(context)
 
         if (parentFragment is ModelManagementListener) {
             modelManagementListener = parentFragment as ModelManagementListener
@@ -120,32 +115,13 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Model Management - Appears normal but shows error on usage
+        // Regional Transcription Model Settings
         downloadModelButton.setOnClickListener {
-            // Show fake progress briefly then error
-            downloadProgress.visibility = View.VISIBLE
-            progressText.visibility = View.VISIBLE
-            progressText.text = "Starting download..."
-            progressText.setTextColor(android.graphics.Color.YELLOW)
-
-            // Simulate brief progress then show error
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                downloadProgress.visibility = View.GONE
-                progressText.text = "❌ Error: Speech recognition service unavailable"
-                progressText.setTextColor(android.graphics.Color.RED)
-
-                Toast.makeText(requireContext(), "Failed to download: Service unavailable", Toast.LENGTH_LONG).show()
-
-                // Reset button state after a delay
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    downloadProgress.visibility = View.GONE
-                    progressText.visibility = View.GONE
-                }, 3000)
-            }, 1500)
+            Toast.makeText(requireContext(), "Regional model download not yet enabled", Toast.LENGTH_LONG).show()
         }
 
         deleteModelButton.setOnClickListener {
-            Toast.makeText(requireContext(), "❌ Error: No model found to delete", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "No regional model installed", Toast.LENGTH_SHORT).show()
         }
 
         // Confidence SeekBar
@@ -172,35 +148,16 @@ class SettingsFragment : Fragment() {
     }
 
     private fun updateModelStatus() {
-        // Speech Recognition Disabled - UI appears normal but errors on usage
-        modelStatusText.text = "Model: Not downloaded"
-        modelSizeText.text = "Size: 40MB"
+        // Regional Model - Not yet integrated
+        modelStatusText.text = "Model: Regional model not loaded"
+        modelSizeText.text = "Size: ~40MB per language"
         downloadModelButton.isEnabled = true
         deleteModelButton.isEnabled = false
-        downloadModelButton.text = "Download Model"
+        downloadModelButton.text = "Download Regional Model"
 
         // Hide progress indicators by default
         downloadProgress.visibility = View.GONE
         progressText.visibility = View.GONE
-
-        /*
-        val isDownloaded = modelManagementListener?.isModelDownloaded() ?: false
-        val modelSize = modelManagementListener?.getModelSize() ?: "40MB"
-
-        if (isDownloaded) {
-            modelStatusText.text = "Model: Downloaded ✅"
-            deleteModelButton.isEnabled = true
-            downloadModelButton.isEnabled = false
-            downloadModelButton.text = "Redownload"
-        } else {
-            modelStatusText.text = "Model: Not downloaded"
-            deleteModelButton.isEnabled = false
-            downloadModelButton.isEnabled = true
-            downloadModelButton.text = "Download Model"
-        }
-
-        modelSizeText.text = "Size: $modelSize"
-        */
     }
 
     private fun showDownloadProgress() {
@@ -208,12 +165,6 @@ class SettingsFragment : Fragment() {
         downloadProgress.visibility = View.GONE
         progressText.visibility = View.GONE
         downloadModelButton.isEnabled = false
-
-        /*
-        downloadProgress.visibility = View.VISIBLE
-        progressText.visibility = View.VISIBLE
-        downloadModelButton.isEnabled = false
-        */
     }
 
     fun hideDownloadProgress() {
@@ -221,12 +172,6 @@ class SettingsFragment : Fragment() {
         downloadProgress.visibility = View.GONE
         progressText.visibility = View.GONE
         updateModelStatus()
-
-        /*
-        downloadProgress.visibility = View.GONE
-        progressText.visibility = View.GONE
-        updateModelStatus()
-        */
     }
 
     fun updateDownloadProgress(progress: Int) {
@@ -235,67 +180,37 @@ class SettingsFragment : Fragment() {
         progressText.visibility = View.VISIBLE
         progressText.text = "❌ Error: Speech recognition disabled"
         progressText.setTextColor(android.graphics.Color.RED)
-
-        /*
-        downloadProgress.progress = progress
-        progressText.text = "Download progress: $progress%"
-        */
     }
 
     private fun loadSettings() {
         // Camera Orientation
-        val orientationIndex = prefs.getInt(KEY_CAMERA_ORIENTATION, 0)
-        cameraOrientationSpinner.setSelection(orientationIndex)
+        cameraOrientationSpinner.setSelection(appPreferences.getCameraOrientation().ordinal)
 
         // Image Quality
-        val qualityIndex = prefs.getInt(KEY_IMAGE_QUALITY, 0)
-        imageQualitySpinner.setSelection(qualityIndex)
+        imageQualitySpinner.setSelection(appPreferences.getImageQuality().ordinal)
 
-        
         // Auto-start Translation
-        autoStartTranslationCheckBox.isChecked = prefs.getBoolean(KEY_AUTO_START_TRANSLATION, false)
+        autoStartTranslationCheckBox.isChecked = appPreferences.shouldAutoStartTranslation()
 
         // Confidence Threshold
-        val confidence = prefs.getInt(KEY_CONFIDENCE_THRESHOLD, 70)
+        val confidence = appPreferences.getConfidenceThreshold()
         confidenceSeekBar.progress = confidence
         confidenceValueText.text = "$confidence%"
     }
 
     private fun saveSettings() {
-        prefs.edit().apply {
-            putInt(KEY_CAMERA_ORIENTATION, cameraOrientationSpinner.selectedItemPosition)
-            putInt(KEY_IMAGE_QUALITY, imageQualitySpinner.selectedItemPosition)
-            putBoolean(KEY_AUTO_START_TRANSLATION, autoStartTranslationCheckBox.isChecked)
-            putInt(KEY_CONFIDENCE_THRESHOLD, confidenceSeekBar.progress)
-            apply()
-        }
+        appPreferences.setCameraOrientation(
+            AppPreferences.CameraOrientation.values()[cameraOrientationSpinner.selectedItemPosition]
+        )
+        appPreferences.setImageQuality(
+            AppPreferences.ImageQuality.values()[imageQualitySpinner.selectedItemPosition]
+        )
+        appPreferences.setAutoStartTranslation(autoStartTranslationCheckBox.isChecked)
+        appPreferences.setConfidenceThreshold(confidenceSeekBar.progress)
     }
 
     private fun resetToDefaults() {
-        prefs.edit().clear().apply()
+        appPreferences.resetToDefaults()
         loadSettings()
-    }
-
-    // Public methods for other components to access settings
-    fun getCameraOrientation(): Int {
-        return prefs.getInt(KEY_CAMERA_ORIENTATION, 0)
-    }
-
-    fun getImageQuality(): String {
-        return when (prefs.getInt(KEY_IMAGE_QUALITY, 0)) {
-            0 -> "high"
-            1 -> "medium"
-            2 -> "low"
-            else -> "medium"
-        }
-    }
-
-    
-    fun shouldAutoStartTranslation(): Boolean {
-        return prefs.getBoolean(KEY_AUTO_START_TRANSLATION, false)
-    }
-
-    fun getConfidenceThreshold(): Int {
-        return prefs.getInt(KEY_CONFIDENCE_THRESHOLD, 70)
     }
 }

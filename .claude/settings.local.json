@@ -4,7 +4,10 @@
       "Bash(adb install:*)",
       "Bash(adb shell input tap:*)",
       "Bash(git commit:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "mcp__web-search-prime__webSearchPrime",
+      "WebFetch(domain:firebase.google.com)",
+      "WebFetch(domain:ai.google.dev)"
     ],
     "deny": [],
     "ask": []

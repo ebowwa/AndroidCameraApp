@@ -120,6 +120,19 @@
             android:src="@drawable/ic_mic"
             android:tint="@color/white" />
 
+        <!-- Stream Button (Future Integration) -->
+        <!--
+        <ImageButton
+            android:id="@+id/startStreamButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="24dp"
+            android:background="@drawable/circular_button_background"
+            android:contentDescription="Start Streaming"
+            android:src="@drawable/ic_cast_connected" 
+            android:tint="@color/white" />
+        -->
+
         <!-- Switch Camera Button - REMOVED -->
         <!-- No camera switching - glasses use back camera only -->
 

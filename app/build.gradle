@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    // Comment out Firebase plugin for now until properly configured
+    // id 'com.google.gms.google-services'
 }
 
 android {
@@ -57,10 +59,23 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
 
-    // Speech Recognition - Removed transcription model (will be replaced later)
-    // implementation 'com.example:transcription-model:0.3.70'
+    // Bottom Sheet & Network
+    implementation 'com.google.android.material:material:1.12.0'
+
+    // Firebase AI for Gemini API - Commented out until Firebase is properly configured
+    // implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    // implementation("com.google.firebase:firebase-ai")
+
+    // HTTP client for direct API calls (compatible versions)
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.google.code.gson:gson:2.8.9")
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // StreamPack Dependencies (Future Integration)
+    // implementation 'io.github.thibaultbee.streampack:streampack-core:3.0.2'
+    // implementation 'io.github.thibaultbee.streampack:streampack-ui:3.0.2'
+    // implementation 'io.github.thibaultbee.streampack:streampack-rtmp:3.0.2'
 }
