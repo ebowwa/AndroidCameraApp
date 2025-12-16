@@ -62,6 +62,17 @@
             android:src="@drawable/ic_camera"
             android:tint="@color/white" />
 
+        <!-- Stream Mode Button -->
+        <ImageButton
+            android:id="@+id/streamModeButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="24dp"
+            android:background="@drawable/circular_button_background"
+            android:contentDescription="Switch to streaming mode"
+            android:src="@drawable/ic_stream"
+            android:tint="@color/white" />
+
         <!-- Switch Camera Button - REMOVED -->
         <!-- No camera switching - glasses use back camera only -->
 

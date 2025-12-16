@@ -58,6 +58,14 @@ class CameraFragment : Fragment() {
         binding.flashButton.setOnClickListener { toggleFlash() }
         // Switch camera button removed - glasses use back camera only
 
+        // Stream mode button - navigate to StreamFragment
+        binding.streamModeButton.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.cameraContainer, com.camerapp.streaming.StreamFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
         startCamera()
     }
 

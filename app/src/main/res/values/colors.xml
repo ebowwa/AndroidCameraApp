@@ -6,4 +6,6 @@
     <color name="semi_transparent_black">#80000000</color>
     <color name="camera_button_bg">#80FFFFFF</color>
     <color name="accent">#FF4CAF50</color>
+    <color name="stream_button_color">#FF5252</color>
+    <color name="stream_button_streaming">#4CAF50</color>
 </resources>
