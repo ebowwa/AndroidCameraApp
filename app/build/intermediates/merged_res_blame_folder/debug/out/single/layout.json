@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.camerapp-mergeDebugResources-41:/layout/fragment_no_connection_sheet.xml",
+        "source": "com.camerapp-main-44:/layout/fragment_no_connection_sheet.xml"
+    },
+    {
+        "merged": "com.camerapp-mergeDebugResources-41:/layout/fragment_speech_recognition.xml",
+        "source": "com.camerapp-main-44:/layout/fragment_speech_recognition.xml"
+    },
+    {
+        "merged": "com.camerapp-mergeDebugResources-41:/layout/activity_main.xml",
+        "source": "com.camerapp-main-44:/layout/activity_main.xml"
+    }
+]

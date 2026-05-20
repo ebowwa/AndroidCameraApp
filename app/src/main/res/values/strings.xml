@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Camera App</string>
+    <string name="capture_photo">Capture Photo</string>
+    <string name="start_voice_input">Start Voice Input</string>
+    <string name="stop_listening">Stop Listening</string>
+    <string name="listening">Listening... Speak now</string>
+    <string name="speech_recognition_error">Speech recognition error</string>
+    <string name="permission_required">Microphone permission required</string>
+</resources>

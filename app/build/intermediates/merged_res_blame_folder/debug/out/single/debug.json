@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "com.camerapp-merged_res-42:/mipmap-hdpi_ic_launcher.xml.flat",
+        "source": "com.camerapp-main-44:/mipmap-hdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/layout_fragment_speech_recognition.xml.flat",
+        "source": "com.camerapp-main-44:/layout/fragment_speech_recognition.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_ic_mic_listening.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/ic_mic_listening.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_ic_mic_success.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/ic_mic_success.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/mipmap-xxhdpi_ic_launcher.xml.flat",
+        "source": "com.camerapp-main-44:/mipmap-xxhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/mipmap-xhdpi_ic_launcher.xml.flat",
+        "source": "com.camerapp-main-44:/mipmap-xhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_bottom_sheet_background.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/bottom_sheet_background.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/mipmap-mdpi_ic_launcher.xml.flat",
+        "source": "com.camerapp-main-44:/mipmap-mdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_ic_mic_unavailable.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/ic_mic_unavailable.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_ic_mic_permission_denied.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/ic_mic_permission_denied.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_ic_mic_idle.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/ic_mic_idle.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/drawable_ic_mic_error.xml.flat",
+        "source": "com.camerapp-main-44:/drawable/ic_mic_error.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/mipmap-xxxhdpi_ic_launcher.xml.flat",
+        "source": "com.camerapp-main-44:/mipmap-xxxhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/layout_activity_main.xml.flat",
+        "source": "com.camerapp-main-44:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.camerapp-merged_res-42:/layout_fragment_no_connection_sheet.xml.flat",
+        "source": "com.camerapp-main-44:/layout/fragment_no_connection_sheet.xml"
+    }
+]
